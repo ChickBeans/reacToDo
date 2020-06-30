@@ -22,7 +22,7 @@ class App extends React.Component {
     ]
     this.state = {
       todos: todos,
-      // idの代わり
+      // idの代わり、現在のid数
       countTodo: todos.length + 1,
     }
   }
@@ -31,9 +31,12 @@ class App extends React.Component {
 
 
     handleSubmit(e) {
+      // e.preventDefaultで画面の更新オフに
       e.preventDefault();
+      // 入力内容を保持
       const title = e.target.title.value;
       const desc = e.target.desc.value;
+      // 配列を複製
       const todos = this.state.todos.slice();
       const countTodo = this.state.countTodo;
 
@@ -45,11 +48,27 @@ class App extends React.Component {
         done: false,
       });
 
-      this.setState({todos})
+      // todosに最新投稿を追加したtodosを追加する
+      this.setState({todos: todos})
+      // countTodoの値を更新する
       this.setState({countTodo: countTodo + 1})
 
+      // 初期化
       e.target.title.value = '';
       e.target.desc.value = '';
+    }
+
+    // Todoの完了/未完了の切り替え
+    setTodoStatus(clickTodo) {
+      // stateの配列オブジェクトに変更を加える為、複製する
+      const todos = this.state.todos.slice();
+      // 配列とidのズレ解消
+      const todo = todos[clickTodo.id - 1];
+      todo.done = !todo.done;
+      todos[clickTodo.id - 1] = todo;
+
+      // todosの更新
+      this.setState({todos: todos});
     }
 
   render() {
@@ -58,7 +77,9 @@ class App extends React.Component {
         <h1>todoアプリを作ってみた</h1>
         <Form handleSubmit={this.handleSubmit.bind(this)} />
         <TodoList
-          todos={this.state.todos} />
+          todos={this.state.todos}
+          setTodoStatus={this.setTodoStatus.bind(this)}
+          />
       </div>
     );
   }
